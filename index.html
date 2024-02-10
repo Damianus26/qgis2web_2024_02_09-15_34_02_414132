@@ -1,0 +1,3098 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css">
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="data/ADMINISTRASIDESA_AR_2.js"></script>
+        <script src="data/pdam_3.js"></script>
+        <script src="data/SPAM_Kaws_4.js"></script>
+        <script src="data/SPAMKAWASAN_5.js"></script>
+        <script src="data/CPMSRGeografis_6.js"></script>
+        <script src="data/CPMSRGEOGRAFIS_7.js"></script>
+        <script src="data/CPMTES_8.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[-8.426404867071856,123.32596900710992],[-8.326450140194343,123.5323039394388]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleRoad_0');
+        map.getPane('pane_GoogleRoad_0').style.zIndex = 400;
+        var layer_GoogleRoad_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleRoad_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleRoad_0;
+        map.addLayer(layer_GoogleRoad_0);
+        map.createPane('pane_GoogleSatellite_1');
+        map.getPane('pane_GoogleSatellite_1').style.zIndex = 401;
+        var layer_GoogleSatellite_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_1',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleSatellite_1;
+        map.addLayer(layer_GoogleSatellite_1);
+        function pop_ADMINISTRASIDESA_AR_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDPPUM'] !== null ? autolinker.link(feature.properties['KDPPUM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NAMOBJ'] !== null ? autolinker.link(feature.properties['NAMOBJ'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['REMARK'] !== null ? autolinker.link(feature.properties['REMARK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDPBPS'] !== null ? autolinker.link(feature.properties['KDPBPS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FCODE'] !== null ? autolinker.link(feature.properties['FCODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LUASWH'] !== null ? autolinker.link(feature.properties['LUASWH'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['UUPP'] !== null ? autolinker.link(feature.properties['UUPP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SRS_ID'] !== null ? autolinker.link(feature.properties['SRS_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LCODE'] !== null ? autolinker.link(feature.properties['LCODE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['METADATA'] !== null ? autolinker.link(feature.properties['METADATA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDEBPS'] !== null ? autolinker.link(feature.properties['KDEBPS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDEPUM'] !== null ? autolinker.link(feature.properties['KDEPUM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDCBPS'] !== null ? autolinker.link(feature.properties['KDCBPS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDCPUM'] !== null ? autolinker.link(feature.properties['KDCPUM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDBBPS'] !== null ? autolinker.link(feature.properties['KDBBPS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KDBPUM'] !== null ? autolinker.link(feature.properties['KDBPUM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WADMKD'] !== null ? autolinker.link(feature.properties['WADMKD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WIADKD'] !== null ? autolinker.link(feature.properties['WIADKD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WADMKC'] !== null ? autolinker.link(feature.properties['WADMKC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WIADKC'] !== null ? autolinker.link(feature.properties['WIADKC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WADMKK'] !== null ? autolinker.link(feature.properties['WADMKK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WIADKK'] !== null ? autolinker.link(feature.properties['WIADKK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WADMPR'] !== null ? autolinker.link(feature.properties['WADMPR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['WIADPR'] !== null ? autolinker.link(feature.properties['WIADPR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPADM'] !== null ? autolinker.link(feature.properties['TIPADM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_Leng'] !== null ? autolinker.link(feature.properties['SHAPE_Leng'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_Area'] !== null ? autolinker.link(feature.properties['SHAPE_Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_ADMINISTRASIDESA_AR_2_0(feature) {
+            switch(String(feature.properties['NAMOBJ'])) {
+                case 'Alap Atadei':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(103,42,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Amakaka':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(80,124,226,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Aramengi':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(207,123,54,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Ataili':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(89,102,222,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Atakera':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(54,237,97,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Atakowa':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(66,21,228,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Atawai':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(75,40,235,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Atu Wa\'Lupang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(80,204,187,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Atulaleng':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(143,58,228,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Aulesa':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(73,197,206,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Babokerong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,14,55,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bakalerek':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(75,210,160,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Balauring':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(211,151,114,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Balurebong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(103,35,212,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Banitobo':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(156,230,137,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bao Lali Duli':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(15,222,156,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Baobolak':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(27,201,102,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Baolangu':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(224,95,30,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Baopana':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(181,56,203,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bareng':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(197,123,224,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bean':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(235,205,135,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Belobaja':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(236,216,125,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Belobao':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,31,190,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Belobatang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(200,176,96,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Benihading I':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(122,212,12,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Benihading Ii':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(159,130,226,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Beutaran':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(142,116,214,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Boli Bean':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(63,83,209,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bour':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(35,134,233,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bungamuda':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(234,74,38,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Buriwutung':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,44,172,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Dikesare':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(40,99,215,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Dolulolong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(202,223,124,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Dori Pewut':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(165,86,234,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Duawutun':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,47,28,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Dulir':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,69,24,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Dulitukan':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(210,111,237,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Hadakewa':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,169,15,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Hingalamamengi':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(239,136,62,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Hoelea':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(54,212,67,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Hoelea Ii':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(218,50,140,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Idalolong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(94,217,186,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Ile Kerbau':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(126,239,239,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Ile Kimok':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(201,105,103,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Ileboli':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(58,160,224,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Imu Lolong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(85,138,204,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Jontona':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(21,96,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Kalikur':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(46,26,229,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Kalikurwailelang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(92,219,223,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Kaohua':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(112,116,205,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Katakeja':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(207,80,37,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Kolipadan':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(74,226,196,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Kolontobo':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,55,152,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Labalimut':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,223,79,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamaau':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(97,127,220,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamadale':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(97,209,229,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamagute':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,31,218,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamalela':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(52,29,202,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamalera A':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(128,212,39,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamalera B':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,55,211,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamatokan':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(46,226,52,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamawara':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(104,156,229,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lamawolo':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(123,221,49,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Laranwutun':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(151,31,237,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lebaata':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(104,229,179,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lebewala':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(238,30,99,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lelata':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,126,234,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lematuka':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,217,137,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lerahinga':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(158,56,202,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lerek':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(116,201,197,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Leubatang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(235,133,146,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Leuburi':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(202,90,82,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Leudanung':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,205,142,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Leuwayang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(29,202,83,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Leuwohung':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(47,233,47,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewoeleng':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(233,84,176,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewogroma':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(74,220,29,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewoleba':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,227,41,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewoleba Barat\'':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(58,212,138,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewoleba Selatan':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(46,43,204,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewoleba Tengah':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(132,238,128,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewoleba Timur':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(239,67,138,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lewoleba Utara':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,138,231,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Leworaja':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(176,236,136,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lite Ulu Mado':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,127,185,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Liwulagang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(146,201,37,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lodotodokowa':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(186,227,125,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lolong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(102,224,81,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Loyobohor':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(124,229,114,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lusiduawutun':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(218,210,99,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Lusilame':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,222,22,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Mahal':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(81,158,200,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Mahal Ii':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(208,46,63,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Mampir':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(212,142,30,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Meluwiting':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,111,113,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Meluwiting I':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,134,54,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Merdeka':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(120,172,212,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Muruona':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(92,225,141,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Napasabok':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(99,128,233,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Nilanapo':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(12,16,211,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Nogo Doni':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,99,189,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Normal':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(197,223,65,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Normal I':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(129,228,211,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Nuba Atalojo':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(133,126,227,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Nubaboli':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(38,186,219,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Nubahaeraka':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(191,46,224,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Nubamado':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,23,193,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Pada':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(77,202,137,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Palilolon':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(60,211,77,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Panama':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(234,197,129,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Pantai Harapan':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,36,178,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Pasir Putih':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(103,228,36,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Paubokol':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(103,215,59,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Penikenek':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(230,128,85,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Petuntawa':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(91,160,220,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Peusawa':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(124,191,215,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Posiwatu':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(175,87,222,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Puor':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(212,110,161,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Puor B':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(224,179,116,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Ria Bao':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,100,230,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Riangbao':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(223,139,54,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Roho':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,79,88,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Roma':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,14,220,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Rumang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(102,182,206,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Selandoro':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,73,50,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Seranggorang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,224,115,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tagawiti':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(46,237,221,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tanjungbatu':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(212,206,40,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tapobali':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(182,208,13,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tapobarang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(193,238,116,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tapolangu':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,87,140,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tewaowutung':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(52,230,88,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tobotani':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(149,231,139,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Todanara':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(116,24,222,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tubukrajan':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(175,210,87,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tubung Walang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(163,53,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Udak Melomata':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(56,240,157,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Umaleu':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(85,172,212,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Waienga':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(143,204,90,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Waijarang':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(104,211,135,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Wailolong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(233,71,120,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Waimatan':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(212,117,160,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Walangsawah':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,25,72,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Waowala':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(207,120,139,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Warawatung':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(19,187,209,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Watokobu':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(189,213,119,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Watudiri':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,207,64,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Wowong':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(101,124,227,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Wuakoreng':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,214,18,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Wulandoni':
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(26,239,179,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_ADMINISTRASIDESA_AR_2',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,89,194,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_ADMINISTRASIDESA_AR_2');
+        map.getPane('pane_ADMINISTRASIDESA_AR_2').style.zIndex = 402;
+        map.getPane('pane_ADMINISTRASIDESA_AR_2').style['mix-blend-mode'] = 'normal';
+        var layer_ADMINISTRASIDESA_AR_2 = new L.geoJson(json_ADMINISTRASIDESA_AR_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ADMINISTRASIDESA_AR_2',
+            layerName: 'layer_ADMINISTRASIDESA_AR_2',
+            pane: 'pane_ADMINISTRASIDESA_AR_2',
+            onEachFeature: pop_ADMINISTRASIDESA_AR_2,
+            style: style_ADMINISTRASIDESA_AR_2_0,
+        });
+        bounds_group.addLayer(layer_ADMINISTRASIDESA_AR_2);
+        map.addLayer(layer_ADMINISTRASIDESA_AR_2);
+        function pop_pdam_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FOTO'] !== null ? '<img src="images/' + String(feature.properties['FOTO']).replace(/[\\\/:]/g, '_').trim() + '">' : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_pdam_3_0() {
+            return {
+                pane: 'pane_pdam_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(37,150,236,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_pdam_3');
+        map.getPane('pane_pdam_3').style.zIndex = 403;
+        map.getPane('pane_pdam_3').style['mix-blend-mode'] = 'normal';
+        var layer_pdam_3 = new L.geoJson(json_pdam_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_pdam_3',
+            layerName: 'layer_pdam_3',
+            pane: 'pane_pdam_3',
+            onEachFeature: pop_pdam_3,
+            style: style_pdam_3_0,
+        });
+        bounds_group.addLayer(layer_pdam_3);
+        map.addLayer(layer_pdam_3);
+        function pop_SPAM_Kaws_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>NAME</strong><br />' + (feature.properties['NAME'] !== null ? autolinker.link(feature.properties['NAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KML_FOLDER'] !== null ? autolinker.link(feature.properties['KML_FOLDER'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Sumber</strong><br />' + (feature.properties['Sumber'] !== null ? autolinker.link(feature.properties['Sumber'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Panjang</strong><br />' + (feature.properties['Panjang'] !== null ? autolinker.link(feature.properties['Panjang'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_SPAM_Kaws_4_0(feature) {
+            switch(String(feature.properties['Sumber'])) {
+                case 'SPAM Waigolo':
+                    return {
+                pane: 'pane_SPAM_Kaws_4',
+                opacity: 1,
+                color: 'rgba(227,121,218,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Wai Ongolok':
+                    return {
+                pane: 'pane_SPAM_Kaws_4',
+                opacity: 1,
+                color: 'rgba(201,134,41,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Wai Platin':
+                    return {
+                pane: 'pane_SPAM_Kaws_4',
+                opacity: 1,
+                color: 'rgba(66,127,212,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_SPAM_Kaws_4');
+        map.getPane('pane_SPAM_Kaws_4').style.zIndex = 404;
+        map.getPane('pane_SPAM_Kaws_4').style['mix-blend-mode'] = 'normal';
+        var layer_SPAM_Kaws_4 = new L.geoJson(json_SPAM_Kaws_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_SPAM_Kaws_4',
+            layerName: 'layer_SPAM_Kaws_4',
+            pane: 'pane_SPAM_Kaws_4',
+            onEachFeature: pop_SPAM_Kaws_4,
+            style: style_SPAM_Kaws_4_0,
+        });
+        bounds_group.addLayer(layer_SPAM_Kaws_4);
+        map.addLayer(layer_SPAM_Kaws_4);
+        function pop_SPAMKAWASAN_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NAME'] !== null ? autolinker.link(feature.properties['NAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KML_FOLDER'] !== null ? autolinker.link(feature.properties['KML_FOLDER'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Sumber'] !== null ? autolinker.link(feature.properties['Sumber'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Panjang'] !== null ? autolinker.link(feature.properties['Panjang'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_SPAMKAWASAN_5_0() {
+            return {
+                pane: 'pane_SPAMKAWASAN_5',
+                opacity: 1,
+                color: 'rgba(231,113,72,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_SPAMKAWASAN_5');
+        map.getPane('pane_SPAMKAWASAN_5').style.zIndex = 405;
+        map.getPane('pane_SPAMKAWASAN_5').style['mix-blend-mode'] = 'normal';
+        var layer_SPAMKAWASAN_5 = new L.geoJson(json_SPAMKAWASAN_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_SPAMKAWASAN_5',
+            layerName: 'layer_SPAMKAWASAN_5',
+            pane: 'pane_SPAMKAWASAN_5',
+            onEachFeature: pop_SPAMKAWASAN_5,
+            style: style_SPAMKAWASAN_5_0,
+        });
+        bounds_group.addLayer(layer_SPAMKAWASAN_5);
+        map.addLayer(layer_SPAMKAWASAN_5);
+        function pop_CPMSRGeografis_6(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">PENERIMAH</th>\
+                        <td>' + (feature.properties['PENERIMAH'] !== null ? autolinker.link(feature.properties['PENERIMAH'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">KECAMATAN</th>\
+                        <td>' + (feature.properties['KECAMATAN'] !== null ? autolinker.link(feature.properties['KECAMATAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">KELURAHAN</th>\
+                        <td>' + (feature.properties['KELURAHAN'] !== null ? autolinker.link(feature.properties['KELURAHAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ALAMAT'] !== null ? autolinker.link(feature.properties['ALAMAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIK'] !== null ? autolinker.link(feature.properties['NIK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X'] !== null ? autolinker.link(feature.properties['X'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y'] !== null ? autolinker.link(feature.properties['Y'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X_COORD'] !== null ? autolinker.link(feature.properties['X_COORD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y_COORD'] !== null ? autolinker.link(feature.properties['Y_COORD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LAT_DMS'] !== null ? autolinker.link(feature.properties['LAT_DMS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LONG_DMS'] !== null ? autolinker.link(feature.properties['LONG_DMS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_CPMSRGeografis_6_0() {
+            return {
+                pane: 'pane_CPMSRGeografis_6',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(61,128,53,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(84,176,74,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CPMSRGeografis_6');
+        map.getPane('pane_CPMSRGeografis_6').style.zIndex = 406;
+        map.getPane('pane_CPMSRGeografis_6').style['mix-blend-mode'] = 'normal';
+        var layer_CPMSRGeografis_6 = new L.geoJson(json_CPMSRGeografis_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CPMSRGeografis_6',
+            layerName: 'layer_CPMSRGeografis_6',
+            pane: 'pane_CPMSRGeografis_6',
+            onEachFeature: pop_CPMSRGeografis_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CPMSRGeografis_6_0(feature));
+            },
+        });
+        var cluster_CPMSRGeografis_6 = new L.MarkerClusterGroup({showCoverageOnHover: false,
+            spiderfyDistanceMultiplier: 2});
+        cluster_CPMSRGeografis_6.addLayer(layer_CPMSRGeografis_6);
+
+        bounds_group.addLayer(layer_CPMSRGeografis_6);
+        cluster_CPMSRGeografis_6.addTo(map);
+        function pop_CPMSRGEOGRAFIS_7(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">PENERIMAH</th>\
+                        <td>' + (feature.properties['PENERIMAH'] !== null ? autolinker.link(feature.properties['PENERIMAH'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KECAMATAN'] !== null ? autolinker.link(feature.properties['KECAMATAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['KELURAHAN'] !== null ? autolinker.link(feature.properties['KELURAHAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ALAMAT'] !== null ? autolinker.link(feature.properties['ALAMAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIK'] !== null ? autolinker.link(feature.properties['NIK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X'] !== null ? autolinker.link(feature.properties['X'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y'] !== null ? autolinker.link(feature.properties['Y'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X_COORD'] !== null ? autolinker.link(feature.properties['X_COORD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y_COORD'] !== null ? autolinker.link(feature.properties['Y_COORD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LAT_DMS'] !== null ? autolinker.link(feature.properties['LAT_DMS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LONG_DMS'] !== null ? autolinker.link(feature.properties['LONG_DMS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_CPMSRGEOGRAFIS_7_0() {
+            return {
+                pane: 'pane_CPMSRGEOGRAFIS_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,158,23,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CPMSRGEOGRAFIS_7');
+        map.getPane('pane_CPMSRGEOGRAFIS_7').style.zIndex = 407;
+        map.getPane('pane_CPMSRGEOGRAFIS_7').style['mix-blend-mode'] = 'normal';
+        var layer_CPMSRGEOGRAFIS_7 = new L.geoJson(json_CPMSRGEOGRAFIS_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CPMSRGEOGRAFIS_7',
+            layerName: 'layer_CPMSRGEOGRAFIS_7',
+            pane: 'pane_CPMSRGEOGRAFIS_7',
+            onEachFeature: pop_CPMSRGEOGRAFIS_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CPMSRGEOGRAFIS_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CPMSRGEOGRAFIS_7);
+        map.addLayer(layer_CPMSRGEOGRAFIS_7);
+        function pop_CPMTES_8(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">PENERIMAH</th>\
+                        <td class="visible-with-data" id="PENERIMAH">' + (feature.properties['PENERIMAH'] !== null ? autolinker.link(feature.properties['PENERIMAH'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">KECAMATAN</th>\
+                        <td>' + (feature.properties['KECAMATAN'] !== null ? autolinker.link(feature.properties['KECAMATAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">KELURAHAN</th>\
+                        <td>' + (feature.properties['KELURAHAN'] !== null ? autolinker.link(feature.properties['KELURAHAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ALAMAT'] !== null ? autolinker.link(feature.properties['ALAMAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIK'] !== null ? autolinker.link(feature.properties['NIK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X'] !== null ? autolinker.link(feature.properties['X'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y'] !== null ? autolinker.link(feature.properties['Y'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['X_COORD'] !== null ? autolinker.link(feature.properties['X_COORD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Y_COORD'] !== null ? autolinker.link(feature.properties['Y_COORD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LAT_DMS'] !== null ? autolinker.link(feature.properties['LAT_DMS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LONG_DMS'] !== null ? autolinker.link(feature.properties['LONG_DMS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_CPMTES_8_0() {
+            return {
+                pane: 'pane_CPMTES_8',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(196,60,57,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CPMTES_8');
+        map.getPane('pane_CPMTES_8').style.zIndex = 408;
+        map.getPane('pane_CPMTES_8').style['mix-blend-mode'] = 'normal';
+        var layer_CPMTES_8 = new L.geoJson(json_CPMTES_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CPMTES_8',
+            layerName: 'layer_CPMTES_8',
+            pane: 'pane_CPMTES_8',
+            onEachFeature: pop_CPMTES_8,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CPMTES_8_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CPMTES_8);
+        map.addLayer(layer_CPMTES_8);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/CPMTES_8.png" /> CPM TES': layer_CPMTES_8,'<img src="legend/CPMSRGEOGRAFIS_7.png" /> CPM SR GEOGRAFIS': layer_CPMSRGEOGRAFIS_7,'<img src="legend/CPMSRGeografis_6.png" /> CPM SR Geografis': cluster_CPMSRGeografis_6,'<img src="legend/SPAMKAWASAN_5.png" /> SPAM KAWASAN': layer_SPAMKAWASAN_5,'SPAM_Kaws<br /><table><tr><td style="text-align: center;"><img src="legend/SPAM_Kaws_4_SPAMWaigolo0.png" /></td><td>SPAM Waigolo</td></tr><tr><td style="text-align: center;"><img src="legend/SPAM_Kaws_4_WaiOngolok1.png" /></td><td>Wai Ongolok</td></tr><tr><td style="text-align: center;"><img src="legend/SPAM_Kaws_4_WaiPlatin2.png" /></td><td>Wai Platin</td></tr></table>': layer_SPAM_Kaws_4,'<img src="legend/pdam_3.png" /> pdam': layer_pdam_3,'ADMINISTRASIDESA_AR<br /><table><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_AlapAtadei0.png" /></td><td>Alap Atadei</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Amakaka1.png" /></td><td>Amakaka</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Aramengi2.png" /></td><td>Aramengi</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Ataili3.png" /></td><td>Ataili</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Atakera4.png" /></td><td>Atakera</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Atakowa5.png" /></td><td>Atakowa</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Atawai6.png" /></td><td>Atawai</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_AtuWaLupang7.png" /></td><td>Atu Wa\'Lupang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Atulaleng8.png" /></td><td>Atulaleng</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Aulesa9.png" /></td><td>Aulesa</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Babokerong10.png" /></td><td>Babokerong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Bakalerek11.png" /></td><td>Bakalerek</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Balauring12.png" /></td><td>Balauring</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Balurebong13.png" /></td><td>Balurebong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Banitobo14.png" /></td><td>Banitobo</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_BaoLaliDuli15.png" /></td><td>Bao Lali Duli</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Baobolak16.png" /></td><td>Baobolak</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Baolangu17.png" /></td><td>Baolangu</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Baopana18.png" /></td><td>Baopana</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Bareng19.png" /></td><td>Bareng</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Bean20.png" /></td><td>Bean</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Belobaja21.png" /></td><td>Belobaja</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Belobao22.png" /></td><td>Belobao</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Belobatang23.png" /></td><td>Belobatang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_BenihadingI24.png" /></td><td>Benihading I</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_BenihadingIi25.png" /></td><td>Benihading Ii</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Beutaran26.png" /></td><td>Beutaran</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_BoliBean27.png" /></td><td>Boli Bean</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Bour28.png" /></td><td>Bour</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Bungamuda29.png" /></td><td>Bungamuda</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Buriwutung30.png" /></td><td>Buriwutung</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Dikesare31.png" /></td><td>Dikesare</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Dolulolong32.png" /></td><td>Dolulolong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_DoriPewut33.png" /></td><td>Dori Pewut</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Duawutun34.png" /></td><td>Duawutun</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Dulir35.png" /></td><td>Dulir</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Dulitukan36.png" /></td><td>Dulitukan</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Hadakewa37.png" /></td><td>Hadakewa</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Hingalamamengi38.png" /></td><td>Hingalamamengi</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Hoelea39.png" /></td><td>Hoelea</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_HoeleaIi40.png" /></td><td>Hoelea Ii</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Idalolong41.png" /></td><td>Idalolong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_IleKerbau42.png" /></td><td>Ile Kerbau</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_IleKimok43.png" /></td><td>Ile Kimok</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Ileboli44.png" /></td><td>Ileboli</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_ImuLolong45.png" /></td><td>Imu Lolong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Jontona46.png" /></td><td>Jontona</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Kalikur47.png" /></td><td>Kalikur</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Kalikurwailelang48.png" /></td><td>Kalikurwailelang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Kaohua49.png" /></td><td>Kaohua</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Katakeja50.png" /></td><td>Katakeja</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Kolipadan51.png" /></td><td>Kolipadan</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Kolontobo52.png" /></td><td>Kolontobo</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Labalimut53.png" /></td><td>Labalimut</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lamaau54.png" /></td><td>Lamaau</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lamadale55.png" /></td><td>Lamadale</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lamagute56.png" /></td><td>Lamagute</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lamalela57.png" /></td><td>Lamalela</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LamaleraA58.png" /></td><td>Lamalera A</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LamaleraB59.png" /></td><td>Lamalera B</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lamatokan60.png" /></td><td>Lamatokan</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lamawara61.png" /></td><td>Lamawara</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lamawolo62.png" /></td><td>Lamawolo</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Laranwutun63.png" /></td><td>Laranwutun</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lebaata64.png" /></td><td>Lebaata</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lebewala65.png" /></td><td>Lebewala</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lelata66.png" /></td><td>Lelata</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lematuka67.png" /></td><td>Lematuka</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lerahinga68.png" /></td><td>Lerahinga</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lerek69.png" /></td><td>Lerek</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Leubatang70.png" /></td><td>Leubatang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Leuburi71.png" /></td><td>Leuburi</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Leudanung72.png" /></td><td>Leudanung</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Leuwayang73.png" /></td><td>Leuwayang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Leuwohung74.png" /></td><td>Leuwohung</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lewoeleng75.png" /></td><td>Lewoeleng</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lewogroma76.png" /></td><td>Lewogroma</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lewoleba77.png" /></td><td>Lewoleba</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LewolebaBarat78.png" /></td><td>Lewoleba Barat\'</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LewolebaSelatan79.png" /></td><td>Lewoleba Selatan</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LewolebaTengah80.png" /></td><td>Lewoleba Tengah</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LewolebaTimur81.png" /></td><td>Lewoleba Timur</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LewolebaUtara82.png" /></td><td>Lewoleba Utara</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Leworaja83.png" /></td><td>Leworaja</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_LiteUluMado84.png" /></td><td>Lite Ulu Mado</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Liwulagang85.png" /></td><td>Liwulagang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lodotodokowa86.png" /></td><td>Lodotodokowa</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lolong87.png" /></td><td>Lolong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Loyobohor88.png" /></td><td>Loyobohor</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lusiduawutun89.png" /></td><td>Lusiduawutun</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Lusilame90.png" /></td><td>Lusilame</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Mahal91.png" /></td><td>Mahal</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_MahalIi92.png" /></td><td>Mahal Ii</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Mampir93.png" /></td><td>Mampir</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Meluwiting94.png" /></td><td>Meluwiting</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_MeluwitingI95.png" /></td><td>Meluwiting I</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Merdeka96.png" /></td><td>Merdeka</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Muruona97.png" /></td><td>Muruona</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Napasabok98.png" /></td><td>Napasabok</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Nilanapo99.png" /></td><td>Nilanapo</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_NogoDoni100.png" /></td><td>Nogo Doni</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Normal101.png" /></td><td>Normal</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_NormalI102.png" /></td><td>Normal I</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_NubaAtalojo103.png" /></td><td>Nuba Atalojo</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Nubaboli104.png" /></td><td>Nubaboli</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Nubahaeraka105.png" /></td><td>Nubahaeraka</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Nubamado106.png" /></td><td>Nubamado</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Pada107.png" /></td><td>Pada</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Palilolon108.png" /></td><td>Palilolon</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Panama109.png" /></td><td>Panama</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_PantaiHarapan110.png" /></td><td>Pantai Harapan</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_PasirPutih111.png" /></td><td>Pasir Putih</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Paubokol112.png" /></td><td>Paubokol</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Penikenek113.png" /></td><td>Penikenek</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Petuntawa114.png" /></td><td>Petuntawa</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Peusawa115.png" /></td><td>Peusawa</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Posiwatu116.png" /></td><td>Posiwatu</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Puor117.png" /></td><td>Puor</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_PuorB118.png" /></td><td>Puor B</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_RiaBao119.png" /></td><td>Ria Bao</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Riangbao120.png" /></td><td>Riangbao</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Roho121.png" /></td><td>Roho</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Roma122.png" /></td><td>Roma</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Rumang123.png" /></td><td>Rumang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Selandoro124.png" /></td><td>Selandoro</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Seranggorang125.png" /></td><td>Seranggorang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tagawiti126.png" /></td><td>Tagawiti</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tanjungbatu127.png" /></td><td>Tanjungbatu</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tapobali128.png" /></td><td>Tapobali</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tapobarang129.png" /></td><td>Tapobarang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tapolangu130.png" /></td><td>Tapolangu</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tewaowutung131.png" /></td><td>Tewaowutung</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tobotani132.png" /></td><td>Tobotani</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Todanara133.png" /></td><td>Todanara</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Tubukrajan134.png" /></td><td>Tubukrajan</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_TubungWalang135.png" /></td><td>Tubung Walang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_UdakMelomata136.png" /></td><td>Udak Melomata</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Umaleu137.png" /></td><td>Umaleu</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Waienga138.png" /></td><td>Waienga</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Waijarang139.png" /></td><td>Waijarang</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Wailolong140.png" /></td><td>Wailolong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Waimatan141.png" /></td><td>Waimatan</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Walangsawah142.png" /></td><td>Walangsawah</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Waowala143.png" /></td><td>Waowala</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Warawatung144.png" /></td><td>Warawatung</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Watokobu145.png" /></td><td>Watokobu</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Watudiri146.png" /></td><td>Watudiri</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Wowong147.png" /></td><td>Wowong</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Wuakoreng148.png" /></td><td>Wuakoreng</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_Wulandoni149.png" /></td><td>Wulandoni</td></tr><tr><td style="text-align: center;"><img src="legend/ADMINISTRASIDESA_AR_2_150.png" /></td><td></td></tr></table>': layer_ADMINISTRASIDESA_AR_2,"Google Satellite": layer_GoogleSatellite_1,"Google Road": layer_GoogleRoad_0,}).addTo(map);
+        setBounds();
+        var i = 0;
+        layer_ADMINISTRASIDESA_AR_2.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NAMOBJ'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['NAMOBJ']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_ADMINISTRASIDESA_AR_2'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_pdam_3.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['id'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['id']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_pdam_3'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_CPMSRGeografis_6.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['PENERIMAH'] !== null?String('<div style="color: #be14c1; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['PENERIMAH']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_CPMSRGeografis_6'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        map.addControl(new L.Control.Search({
+            layer: layer_CPMSRGeografis_6,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'PENERIMAH'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        resetLabels([layer_ADMINISTRASIDESA_AR_2,layer_pdam_3,layer_CPMSRGeografis_6]);
+        map.on("zoomend", function(){
+            resetLabels([layer_ADMINISTRASIDESA_AR_2,layer_pdam_3,layer_CPMSRGeografis_6]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_ADMINISTRASIDESA_AR_2,layer_pdam_3,layer_CPMSRGeografis_6]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_ADMINISTRASIDESA_AR_2,layer_pdam_3,layer_CPMSRGeografis_6]);
+        });
+        </script>
+    </body>
+</html>
